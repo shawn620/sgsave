@@ -1,0 +1,66 @@
+BUILD=$HOME/myGIT/app
+#source $HOME/nyt/nyt5-puppet/.nyt
+#source ~/.git-completion
+
+# -----------------------------------------------------------
+# gco - checkout latest release branch- e.g. gco 1.7.0
+# -----------------------------------------------------------
+function gco() {
+  if [ ! "$#" -eq 1 ]; then
+      echo "you must give a release number ......"
+      echo "For example, gco 1.7.0"
+      echo
+      exit -1
+  else
+      for i in nyt5-app-article nyt5-app-interactive nyt5-app-shell
+      do
+	 cd $BUILD/$i;
+	 echo "make local release branch for $i:  release/$1 ......";
+         git checkout -b release/$1 origin/release/$1 ;
+	 echo
+      done
+     for i in nyt5-foundation
+     do
+	cd $BUILD/$i
+	echo "make local $i release branch release/$1 ......";
+	git checkout -b release/$1;
+		for j in article interactive shell
+		do
+		    echo "make local $i $j bundle release branch ..."
+	    	    git checkout -b release/$j/$1 origin/release/$j/$1
+		    echo
+		done
+	echo
+     done
+
+     for i in nyt5-shared
+     do
+	cd $BUILD/$i
+		for j in article interactive shell
+		do
+		    echo "make local $i $j bundle release branch ..."
+	    	    git checkout -b release/$j/$1 origin/release/$j/$1
+	 	    echo
+		done
+	echo
+     done
+  fi
+}
+
+# -------------------------------------------------------
+#   gld ,  delete all local release branch
+# ------------------------------------------------------
+function gld() {
+    for b in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-foundation nyt5-shared
+	do 
+	   cd $BUILD/$b
+	   git co develop
+	   BRS=`git branch |grep release`
+	   for j in $BRS
+		do
+		   echo "Delete old release branch $j under $b ......"
+		   git branch -d $j
+		   echo
+		done
+   	done
+}
