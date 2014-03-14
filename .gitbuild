@@ -1,0 +1,124 @@
+#
+# Originally put together by Reed Emmons
+#
+# tweeted for my own use
+#
+BUILD=$HOME/myGIT/release
+#source $HOME/nyt/nyt5-puppet/.nyt
+#source ~/.git-completion
+
+# -----------------------------------------------------------
+# NYT Servers
+# -----------------------------------------------------------
+#alias app1='ssh reed.emmons@app1.prvt.nytimes.com'
+#alias app3='ssh reed.emmons@app3.qprvt.nytimes.com'
+#alias storage='ssh root@ec2-50-17-56-184.compute-1.amazonaws.com'
+#alias monitoring='ssh root@ec2-54-211-2-153.compute-1.amazonaws.com'
+
+# -----------------------------------------------------------
+# Apps
+# -----------------------------------------------------------
+#alias chrome-benchmark='open -a "Google Chrome" --args --enable-benchmarking --enable-net-benchmarking --enable-stats-table'
+#alias canary-no-security='open -a Google\ Chrome\ Canary --args --disable-web-security'
+
+# -----------------------------------------------------------
+# gitr - RELEASE - e.g. gitr article 1.1.0
+# -----------------------------------------------------------
+function gitr() {
+  if [ "$1" == "foundation" ]; then
+      cd $BUILD/nyt5-$1;
+      echo "make release branch nyt5-foundation/$2 ......"
+      echo
+      git checkout develop;
+      git pull;
+      git checkout -b shawntest/$2;
+      git push -u origin shawntest/$2;
+      cd -
+      echo 
+  else
+      for i in nyt5-shared nyt5-foundation
+      do
+	 cd $BUILD/$i;
+	 echo "make release branch $i/shawntest/$2 ......";
+ 	 echo
+         git checkout develop;
+         git pull;
+         git checkout -b shawntest/$1/$2;
+         git push -u origin shawntest/$1/$2;
+	 cd -
+	 echo
+      done
+     for i in nyt5-app-$1
+     do
+	cd $BUILD/$i
+	echo "make release branch shawntest/$2 ......";
+	git checkout develop;
+	git pull;
+	git checkout -b shawntest/$2;
+	git push -u origin shawntest/$2;
+	cd -
+	echo
+     done
+  fi
+}
+# -----------------------------------------------------------
+# gith - HOTFIX - e.g. gith article 1.1.1
+# -----------------------------------------------------------
+function gith() {
+  cd ~/nyt/nyt5-shared;
+  git checkout master;
+  git pull;
+  git checkout -b release/$1/$2;
+  git push -u origin release/$1/$2;
+
+  cd ~/nyt/nyt5-foundation;
+  git checkout master;
+  git pull;
+  git checkout -b release/$1/$2;
+  git push -u origin release/$1/$2;
+  
+  cd ~/nyt/nyt5-app-$1;
+  git checkout master;
+  git pull;
+  git checkout -b release/$2;
+  git push -u origin release/$2;
+}
+
+# -----------------------------------------------------------
+# gitf - FEATURE - e.g. gitf preferences-api
+# -----------------------------------------------------------
+function gitf() {
+  git checkout develop;
+  git pull;
+  git checkout -b feature/$1;
+  git push -u origin feature/$1;
+}
+
+# -----------------------------------------------------------
+# gitfd - DELETE BRANCH - e.g. gitfd feature/preferences-api
+# -----------------------------------------------------------
+function gitfd() {
+  git checkout develop
+  git branch -d feature/$1
+  git push origin :feature/$1
+}
+
+# -----------------------------------------------------------
+# gitrd - DELETE RELEASE - e.g. gitrd article 1.1.0
+# -----------------------------------------------------------
+function gitrd() {
+  cd ~/nyt/nyt5-shared;
+  git checkout develop
+  git branch -d release/$1/$2;
+  git push origin :release/$1/$2;
+
+  cd ~/nyt/nyt5-foundation;
+  git checkout develop
+  git branch -d release/$1/$2;
+  git push origin :release/$1/$2;
+
+  cd ~/nyt/nyt5-app-$1;
+  git checkout develop
+  git branch -d release/$2;
+  git push origin :release/$2;
+}
