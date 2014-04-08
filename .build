@@ -15,6 +15,8 @@ function gco() {
       for i in nyt5-app-article nyt5-app-interactive nyt5-app-shell
       do
 	 cd $BUILD/$i;
+	 git checkout develop;
+	 git pull > /dev/null;
 	 echo "make local release branch for $i:  release/$1 ......";
          git checkout -b release/$1 origin/release/$1 ;
 	 echo
@@ -22,8 +24,10 @@ function gco() {
      for i in nyt5-foundation
      do
 	cd $BUILD/$i
+	git checkout develop;
+	git pull >/dev/null;
 	echo "make local $i release branch release/$1 ......";
-	git checkout -b release/$1;
+	git checkout -b release/$1 origin/release/$1;
 		for j in article interactive shell
 		do
 		    echo "make local $i $j bundle release branch ..."
@@ -36,6 +40,8 @@ function gco() {
      for i in nyt5-shared
      do
 	cd $BUILD/$i
+	   git checkout develop;
+	   git pull > /dev/null ;
 		for j in article interactive shell
 		do
 		    echo "make local $i $j bundle release branch ..."
@@ -54,13 +60,28 @@ function gld() {
     for b in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-foundation nyt5-shared
 	do 
 	   cd $BUILD/$b
-	   git co develop
+	   git checkout develop;
+	   git pull > /dev/null ;
 	   BRS=`git branch |grep release`
 	   for j in $BRS
 		do
 		   echo "Delete old release branch $j under $b ......"
-		   git branch -d $j
+		   git branch -D $j
 		   echo
 		done
    	done
+}
+
+function gup() {
+   for b in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-foundation nyt5-shared
+       do
+           cd $BUILD/$b
+	   for j in develop master
+	   do
+           	git checkout $j 
+		git pull > /dev/null
+	  	echo "updated branch $j under $b ..."
+		echo
+           done
+       done
 }
