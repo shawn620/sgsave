@@ -1,17 +1,7 @@
 #
-# Originally put together by Reed Emmons
-# tweeted for my own use
+# Originally by Reed then myself 
 #
 BUILD=$HOME/myGIT/app
-#source $HOME/nyt/nyt5-puppet/.nyt
-#source ~/.git-completion
-
-# -----------------------------------------------------------
-# Apps
-# -----------------------------------------------------------
-#alias chrome-benchmark='open -a "Google Chrome" --args --enable-benchmarking --enable-net-benchmarking --enable-stats-table'
-#alias canary-no-security='open -a Google\ Chrome\ Canary --args --disable-web-security'
-
 # -----------------------------------------------------------
 # gitr - making ELEASE branch - e.g. gitr 1.10.0
 # -----------------------------------------------------------
@@ -19,11 +9,11 @@ function gitr() {
    for i in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-foundation nyt5-app-blogs
 	do
 	   cd $BUILD/$i
-	   echo "make release branch for $i shawntest/$1 ......"
+	   echo "make remote and local release branch $i <===> release/$1 ......"
 	   git checkout develop;
 	   git pull;
-	   git checkout -b shawntest/$1
-	   git push -u origin shawntest/$1
+	   git checkout -b release/$1
+	   git push -u origin release/$1
 	   echo 
 	done
  
@@ -33,11 +23,11 @@ function gitr() {
 	   k=`echo $j |cut -d"-" -f2`
 		for m in article interactive shell blogs
 			do 
-			   echo "make release branch bundle $k shawntest/$m/$1 ......"
+			   echo "make remote and local release branch bundle $k <===> release/$m/$1 ......"
 			   git checkout develop
 			   git pull
-	 		   git checkout -b shawntest/$m/$1
-			   git push -u origin shawntest/$m/$1
+	 		   git checkout -b release/$m/$1
+			   git push -u origin release/$m/$1
 			   echo
 			done
         done
@@ -47,59 +37,23 @@ function gitr() {
 # -----------------------------------------------------------
 function gith() {
   cd $BUILD/nyt5-shared;
+  echo "making remote and local HOTFIX branch for nyt5-shared <===> release/$1/$2 ......"
   git checkout master;
   git pull;
-  git checkout -b shawntest/$1/$2;
-  git push -u origin shawntest/$1/$2;
+  git checkout -b release/$1/$2;
+  git push -u origin release/$1/$2;
 
   cd $BUILD/nyt5-foundation;
+  echo "making remote and local HOTFIX branch for nyt5-foundation <===> release/$1/$2 ......"
   git checkout master;
   git pull;
-  git checkout -b shawntest/$1/$2;
-  git push -u origin shawntest/$1/$2;
+  git checkout -b release/$1/$2;
+  git push -u origin release/$1/$2;
   
   cd $BUILD/nyt5-app-$1;
+  echo "making remote and local HOTFIX branch for nyt5-app-$1 <===> release/$2 ......"
   git checkout master;
   git pull;
-  git checkout -b shawntest/$2;
-  git push -u origin shawntest/$2;
-}
-
-# -----------------------------------------------------------
-# gitf - FEATURE - e.g. gitf preferences-api
-# -----------------------------------------------------------
-function gitf() {
-  git checkout develop;
-  git pull;
-  git checkout -b feature/$1;
-  git push -u origin feature/$1;
-}
-
-# -----------------------------------------------------------
-# gitfd - DELETE BRANCH - e.g. gitfd feature/preferences-api
-# -----------------------------------------------------------
-function gitfd() {
-  git checkout develop
-  git branch -d feature/$1
-  git push origin :feature/$1
-}
-
-# -----------------------------------------------------------
-# gitrd - DELETE RELEASE - e.g. gitrd article 1.1.0
-# -----------------------------------------------------------
-function gitrd() {
-  cd ~/nyt/nyt5-shared;
-  git checkout develop
-  git branch -d release/$1/$2;
-  git push origin :release/$1/$2;
-
-  cd ~/nyt/nyt5-foundation;
-  git checkout develop
-  git branch -d release/$1/$2;
-  git push origin :release/$1/$2;
-
-  cd ~/nyt/nyt5-app-$1;
-  git checkout develop
-  git branch -d release/$2;
-  git push origin :release/$2;
+  git checkout -b release/$2;
+  git push -u origin release/$2;
 }

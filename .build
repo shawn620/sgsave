@@ -17,7 +17,7 @@ function gco() {
 	 cd $BUILD/$i;
 	 git checkout develop;
 	 git pull > /dev/null;
-	 echo "make local release branch for $i:  release/$1 ......";
+	 echo "make local release branch under $i =====> release/$1 ......";
          git checkout -b release/$1 origin/release/$1 ;
 	 echo
       done
@@ -26,11 +26,11 @@ function gco() {
 	cd $BUILD/$i
 	git checkout develop;
 	git pull >/dev/null;
-	echo "make local $i release branch release/$1 ......";
+	echo "make local release branch under $i =====> release/$1 ......";
 	git checkout -b release/$1 origin/release/$1;
 		for j in article interactive shell
 		do
-		    echo "make local $i $j bundle release branch ..."
+		    echo "make local release branch for $j bundle ====> $i : release/$j/$1  ..."
 	    	    git checkout -b release/$j/$1 origin/release/$j/$1
 		    echo
 		done
@@ -44,7 +44,7 @@ function gco() {
 	   git pull > /dev/null ;
 		for j in article interactive shell
 		do
-		    echo "make local $i $j bundle release branch ..."
+		    echo "make local release branch for $j bundle ====> $i : release/$j/$1  ..."
 	    	    git checkout -b release/$j/$1 origin/release/$j/$1
 	 	    echo
 		done
@@ -72,15 +72,18 @@ function gld() {
    	done
 }
 
+# -------------------------------------------------------
+#   gup ,  update develop master and all release branch 
+# ------------------------------------------------------
 function gup() {
    for b in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-foundation nyt5-shared
        do
            cd $BUILD/$b
-	   for j in develop master
+	   for j in develop master $(git branch |grep release)
 	   do
+		echo "updated local branch $b ===> $j ..."
            	git checkout $j 
 		git pull > /dev/null
-	  	echo "updated branch $j under $b ..."
 		echo
            done
        done
