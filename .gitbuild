@@ -1,59 +1,157 @@
 #
-# Originally by Reed then myself 
+# Originally by Reed; then added/mod by me
 #
 BUILD=$HOME/myGIT/app
 # -----------------------------------------------------------
 # gitr - making ELEASE branch - e.g. gitr 1.10.0
 # -----------------------------------------------------------
 function gitr() {
-   for i in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-foundation nyt5-app-blogs
-	do
-	   cd $BUILD/$i
-	   echo "make remote and local release branch $i <===> release/$1 ......"
-	   git checkout develop;
-	   git pull;
-	   git checkout -b release/$1
-	   git push -u origin release/$1
-	   echo 
-	done
+   if [ "$#" -ne 1 ]; then
+   	  echo "You must provide a release number, eg. gitr 1.12.0"
+   	  echo 
+   	  exit 1
+   else
+      for i in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-app-leonhardt nyt5-foundation nyt5-app-blogs
+	       do
+	         cd $BUILD/$i
+	         echo "make remote and local release branch $i <===> release/$1 ......"
+	         git checkout develop;
+	         git pull;
+	         git checkout -b release/$1
+	         git push -u origin release/$1
+	         echo 
+	       done
  
-   for j in nyt5-foundation nyt5-shared
+      for j in nyt5-foundation nyt5-shared
         do
-	   cd $BUILD/$j
-	   k=`echo $j |cut -d"-" -f2`
-		for m in article interactive shell blogs
-			do 
-			   echo "make remote and local release branch bundle $k <===> release/$m/$1 ......"
-			   git checkout develop
-			   git pull
-	 		   git checkout -b release/$m/$1
-			   git push -u origin release/$m/$1
-			   echo
-			done
+	         cd $BUILD/$j
+	         k=`echo $j |cut -d"-" -f2`
+		       for m in article interactive shell blogs leonhardt
+			       do 
+			           echo "make remote and local release branch bundle $k <===> release/$m/$1 ......"
+			           git checkout develop
+			           git pull
+	 		           git checkout -b release/$m/$1
+			           git push -u origin release/$m/$1
+			           echo
+			       done
         done
+   fi
 }
+
+# -----------------------------------------------------------
+# gitrr - making ELEASE branch - e.g. gitr 1.10.0
+# -----------------------------------------------------------
+function gitrr() {
+   if [ "$#" -ne 1 ]; then
+          echo "You must provide a release number, eg. gitr 1.12.0"
+          echo
+          exit 1
+   else
+      for j in nyt5-foundation nyt5-shared
+        do
+                 cd $BUILD/$j
+                 k=`echo $j |cut -d"-" -f2`
+                       for m in leonhardt
+                               do
+                                   echo "make remote and local release branch bundle $k <===> release/$m/$1 ......"
+                                   git checkout develop
+                                   git pull
+                                   git checkout -b release/$m/$1
+                                   git push -u origin release/$m/$1
+                                   echo
+                               done
+        done
+   fi
+}
+
+
+
 # -----------------------------------------------------------
 # gith - making HOTFIX branch  - e.g. gith article 1.10.1
 # -----------------------------------------------------------
 function gith() {
-  cd $BUILD/nyt5-shared;
-  echo "making remote and local HOTFIX branch for nyt5-shared <===> release/$1/$2 ......"
-  git checkout master;
-  git pull;
-  git checkout -b release/$1/$2;
-  git push -u origin release/$1/$2;
+  if [ "$#" -ne 2 ]; then
+	   echo "You must provide app's name and hotfix release number "
+	   echo "For instance: gith article 1.10.1 "
+	   echo
+	   exit
+  else
+  	 cd $BUILD/nyt5-shared;
+     	    echo "making remote and local HOTFIX branch for nyt5-shared <===> release/$1/$2 ......"
+	        git checkout master;
+  	      git pull;
+  	      git checkout -b release/$1/$2;
+  	      git push -u origin release/$1/$2;
+	   cd $BUILD/nyt5-foundation;
+  	      echo "making remote and local HOTFIX branch for nyt5-foundation <===> release/$1/$2 ......"
+          git checkout master;
+  	      git pull;
+  	      git checkout -b release/$1/$2;
+  	      git push -u origin release/$1/$2;
+  	 cd $BUILD/nyt5-app-$1;
+  	      echo "making remote and local HOTFIX branch for nyt5-app-$1 <===> release/$2 ......"
+  	      git checkout master;
+  	      git pull;
+  	      git checkout -b release/$2;
+	       git push -u origin release/$2;
+  fi	
+}
 
-  cd $BUILD/nyt5-foundation;
-  echo "making remote and local HOTFIX branch for nyt5-foundation <===> release/$1/$2 ......"
-  git checkout master;
-  git pull;
-  git checkout -b release/$1/$2;
-  git push -u origin release/$1/$2;
-  
-  cd $BUILD/nyt5-app-$1;
-  echo "making remote and local HOTFIX branch for nyt5-app-$1 <===> release/$2 ......"
-  git checkout master;
-  git pull;
-  git checkout -b release/$2;
-  git push -u origin release/$2;
+# ----------------------------------------------------------------------
+# gitb - makingi blogs release/HOTFIX branch  - e.g. gitb  blogs 1.10.1
+# ----------------------------------------------------------------------
+function gitb() {
+  if [ "$#" -ne 2 ]; then
+	   echo "This is only for BLOGS release/hotfix branch creation "
+	   echo "For instance: gitbi blogs 1.10.1 "
+	   echo
+	   exit
+  else
+  	 cd $BUILD/nyt5-shared;
+     	    echo "making remote and local HOTFIX branch for nyt5-shared <===> release/$1/$2 ......"
+	      git checkout master;
+  	      git pull;
+  	      git checkout -b release/$1/$2;
+  	      git push -u origin release/$1/$2;
+	   
+	cd $BUILD/nyt5-foundation;
+  	      echo "making remote and local HOTFIX branch for nyt5-foundation <===> release/$1/$2 ......"
+              git checkout master;
+  	      git pull;
+  	      git checkout -b release/$1/$2;
+  	      git push -u origin release/$1/$2;
+  	 
+	cd $BUILD/nyt5-app-$1;
+  	      echo "making remote and local HOTFIX branch for nyt5-app-$1 <===> release/$2 ......"
+  	      git checkout develop;
+  	      git pull;
+  	      git checkout -b release/$2;
+	      git push -u origin release/$2;
+  fi	
+}
+# ---------------------------------------------------------------------------------
+# gitbrcd - delete branch that 3 months old and being merged into others
+# ---------------------------------------------------------------------------------
+gitbrcd() {
+  DEL_BRC=""
+  for i in `git branch -r --merged|grep -v master|grep -v develop`
+  #for i in `git branch -r --merged|grep release`
+      do
+	       AGE=$(git log -1 --pretty=format:"%ar" $i |grep months|cut -d" " -f1)
+	       if [ -z "$AGE" ]; then 
+            continue
+         elif [ "$AGE" -ge 3 ]; then 
+		        DEL_BRC="$DEL_BRC  $i"
+	       else
+	 	        continue
+         fi
+      done
+
+  for j in $DEL_BRC
+      do 
+         brc=`echo $j |awk -Forigin/ '{print $2}'`
+         echo $brc
+         git push origin :$brc
+      done
 }

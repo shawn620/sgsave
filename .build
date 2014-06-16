@@ -12,43 +12,43 @@ function gco() {
       echo
       exit -1
   else
-      for i in nyt5-app-article nyt5-app-interactive nyt5-app-shell
+      for i in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-app-leonhardt
       do
-	 cd $BUILD/$i;
-	 git checkout develop;
-	 git pull > /dev/null;
-	 echo "make local release branch under $i =====> release/$1 ......";
+		 cd $BUILD/$i;
+		 git checkout develop;
+	 	 git pull > /dev/null;
+	 	 echo "make local release branch under $i =====> release/$1 ......";
          git checkout -b release/$1 origin/release/$1 ;
-	 echo
+	 	 echo
       done
-     for i in nyt5-foundation
-     do
-	cd $BUILD/$i
-	git checkout develop;
-	git pull >/dev/null;
-	echo "make local release branch under $i =====> release/$1 ......";
-	git checkout -b release/$1 origin/release/$1;
-		for j in article interactive shell
-		do
+      for i in nyt5-foundation
+      do
+		 cd $BUILD/$i
+		 git checkout develop;
+		 git pull >/dev/null;
+		 echo "make local release branch under $i =====> release/$1 ......";
+		 git checkout -b release/$1 origin/release/$1;
+		 for j in article interactive shell leonhardt
+		 do
 		    echo "make local release branch for $j bundle ====> $i : release/$j/$1  ..."
-	    	    git checkout -b release/$j/$1 origin/release/$j/$1
+	        git checkout -b release/$j/$1 origin/release/$j/$1
 		    echo
 		done
-	echo
-     done
+		echo
+       done
 
      for i in nyt5-shared
      do
-	cd $BUILD/$i
-	   git checkout develop;
-	   git pull > /dev/null ;
-		for j in article interactive shell
-		do
+		 cd $BUILD/$i
+	   	 git checkout develop;
+	   	 git pull > /dev/null ;
+		 for j in article interactive shell leonhardt
+		 do
 		    echo "make local release branch for $j bundle ====> $i : release/$j/$1  ..."
-	    	    git checkout -b release/$j/$1 origin/release/$j/$1
+	    	git checkout -b release/$j/$1 origin/release/$j/$1
 	 	    echo
-		done
-	echo
+		 done
+		 echo
      done
   fi
 }
@@ -57,7 +57,7 @@ function gco() {
 #   gld ,  delete all local release branch
 # ------------------------------------------------------
 function gld() {
-    for b in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-foundation nyt5-shared
+    for b in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-app-leonhardt nyt5-app-blogs nyt5-foundation nyt5-shared
 	do 
 	   cd $BUILD/$b
 	   git checkout develop;
@@ -72,19 +72,37 @@ function gld() {
    	done
 }
 
+
 # -------------------------------------------------------
 #   gup ,  update develop master and all release branch 
 # ------------------------------------------------------
 function gup() {
-   for b in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-foundation nyt5-shared
+   for b in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-app-leonhardt nyt5-app-blogs nyt5-foundation nyt5-shared
        do
            cd $BUILD/$b
-	   for j in develop master $(git branch |grep release)
-	   do
-		echo "updated local branch $b ===> $j ..."
-           	git checkout $j 
-		git pull > /dev/null
-		echo
+	 	   for j in develop master $(git branch |grep release|cut -c3-)
+	   	   do
+				echo "updated local branch $b ===> $j ..."
+           		git checkout $j 
+				git pull > /dev/null
+				echo
            done
        done
+}
+
+# -------------------------------------------------------
+#   gst ,  git status for master and all release branch 
+# ------------------------------------------------------
+function gst() {
+   for b in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-app-leonhardt nyt5-app-blogs nyt5-foundation nyt5-shared
+       do
+           cd $BUILD/$b
+	 	   for j in master $(git branch |grep release|cut -c3-)
+	   	   do
+				echo "git status for local branch $b ===> $j ..."
+           		git checkout $j 
+				git status
+				echo
+           done
+       done 
 }
