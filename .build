@@ -12,7 +12,7 @@ function gco() {
       echo
       exit -1
   else
-      for i in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-app-leonhardt
+      for i in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-app-leonhardt nyt5-app-homepage nyt5-app-paidpost
       do
 		 cd $BUILD/$i;
 		 git checkout develop;
@@ -28,7 +28,7 @@ function gco() {
 		 git pull >/dev/null;
 		 echo "make local release branch under $i =====> release/$1 ......";
 		 git checkout -b release/$1 origin/release/$1;
-		 for j in article interactive shell leonhardt
+		 for j in article interactive shell leonhardt homepage paidpost
 		 do
 		    echo "make local release branch for $j bundle ====> $i : release/$j/$1  ..."
 	        git checkout -b release/$j/$1 origin/release/$j/$1
@@ -42,7 +42,7 @@ function gco() {
 		 cd $BUILD/$i
 	   	 git checkout develop;
 	   	 git pull > /dev/null ;
-		 for j in article interactive shell leonhardt
+		 for j in article interactive shell leonhardt homepage paidpost
 		 do
 		    echo "make local release branch for $j bundle ====> $i : release/$j/$1  ..."
 	    	git checkout -b release/$j/$1 origin/release/$j/$1
@@ -53,11 +53,53 @@ function gco() {
   fi
 }
 
+# -----------------------------------------------------------------------
+# gcoapp - checkout a single app release branch- e.g. gco homepage 1.26.1
+# -----------------------------------------------------------------------
+function gcoapp() {
+  if [ ! "$#" -eq 2 ]; then
+      echo "you must give an app name and a release number ......"
+      echo "For example, gco article 1.26.1"
+      echo
+      exit -1
+  elif [ "$1" != "foundation" ]; then
+      	 cd $BUILD/nyt5-app-$1;
+		 git checkout develop;
+	 	 git pull > /dev/null;
+	 	 echo "make local $1 release branch =====> release/$2 ......";
+         git checkout -b release/$2 origin/release/$2 ;
+	 	 echo
+
+		 cd $BUILD/nyt5-foundation
+		 git checkout develop;
+		 git pull >/dev/null;
+		 echo "make local $1 release branch for foundaton bundle  =====> release/$1/$2 ......";
+		 git checkout -b release/$1/$2 origin/release/$1/$2;
+		 echo	 
+      
+ 		 cd $BUILD/nyt5-shared
+	   	 git checkout develop;
+	   	 git pull > /dev/null ;
+		 echo "make local $1 release branch for shared bundle ====> release/$1/$2  ..."
+	     git checkout -b release/$1/$2 origin/release/$1/$2
+	 	 echo
+		 
+  else 
+		 cd $BUILD/nyt5-foundation
+		 git checkout develop;
+		 git pull >/dev/null;
+		 echo "make local $1 release branch =====> release/$2 ......";
+		 git checkout -b release/$2 origin/release/$2;
+		 echo  
+  fi
+}
+
+
 # -------------------------------------------------------
 #   gld ,  delete all local release branch
 # ------------------------------------------------------
 function gld() {
-    for b in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-app-leonhardt nyt5-app-blogs nyt5-foundation nyt5-shared
+    for b in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-app-leonhardt nyt5-app-homepage nyt5-app-blogs nyt5-foundation nyt5-app-paidpost nyt5-shared
 	do 
 	   cd $BUILD/$b
 	   git checkout develop;
@@ -77,7 +119,7 @@ function gld() {
 #   gup ,  update develop master and all release branch 
 # ------------------------------------------------------
 function gup() {
-   for b in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-app-leonhardt nyt5-app-blogs nyt5-foundation nyt5-shared
+   for b in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-app-leonhardt nyt5-app-homepage nyt5-app-blogs nyt5-app-paidpost nyt5-foundation nyt5-shared
        do
            cd $BUILD/$b
 	 	   for j in develop master $(git branch |grep release|cut -c3-)
@@ -94,7 +136,7 @@ function gup() {
 #   gst ,  git status for master and all release branch 
 # ------------------------------------------------------
 function gst() {
-   for b in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-app-leonhardt nyt5-app-blogs nyt5-foundation nyt5-shared
+   for b in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-app-leonhardt nyt5-app-homepage nyt5-app-blogs nyt5-app-paidpost nyt5-foundation nyt5-shared
        do
            cd $BUILD/$b
 	 	   for j in master $(git branch |grep release|cut -c3-)

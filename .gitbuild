@@ -11,7 +11,7 @@ function gitr() {
    	  echo 
    	  exit 1
    else
-      for i in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-app-leonhardt nyt5-foundation nyt5-app-blogs
+      for i in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-app-leonhardt nyt5-app-homepage nyt5-foundation nyt5-app-blogs nyt5-app-paidpost
 	       do
 	         cd $BUILD/$i
 	         echo "make remote and local release branch $i <===> release/$1 ......"
@@ -26,7 +26,7 @@ function gitr() {
         do
 	         cd $BUILD/$j
 	         k=`echo $j |cut -d"-" -f2`
-		       for m in article interactive shell blogs leonhardt
+		       for m in article interactive shell blogs leonhardt homepage
 			       do 
 			           echo "make remote and local release branch bundle $k <===> release/$m/$1 ......"
 			           git checkout develop
@@ -99,7 +99,7 @@ function gith() {
 }
 
 # ----------------------------------------------------------------------
-# gitb - makingi blogs release/HOTFIX branch  - e.g. gitb  blogs 1.10.1
+# gitb - making blogs release/HOTFIX branch  - e.g. gitb  blogs 1.10.1
 # ----------------------------------------------------------------------
 function gitb() {
   if [ "$#" -ne 2 ]; then
@@ -130,10 +130,15 @@ function gitb() {
 	      git push -u origin release/$2;
   fi	
 }
-# ---------------------------------------------------------------------------------
-# gitbrcd - delete branch that 3 months old and being merged into others
-# ---------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------
+# gitbrcd - delete branch that 3 months old and being merged into others; command run under a specific repo
+# ---------------------------------------------------------------------------------------------------------
 gitbrcd() {
+# first clean up all stale local tracking branch
+  git remote prune origin 
+  
+  git checkout develop
+  git pull > /dev/null
   DEL_BRC=""
   for i in `git branch -r --merged|grep -v master|grep -v develop`
   #for i in `git branch -r --merged|grep release`
@@ -153,5 +158,35 @@ gitbrcd() {
          brc=`echo $j |awk -Forigin/ '{print $2}'`
          echo $brc
          git push origin :$brc
+      done
+}
+
+# ---------------------------------------------------------------------------------------------------------
+# gitbdd - delete branch that 6 months old regardless its merge status under a specific repo
+# ---------------------------------------------------------------------------------------------------------
+gitbdd() {
+# first clean up all stale local tracking branch
+  git remote prune origin 
+  git checkout develop
+  git pull > /dev/null 
+  DEL_BRC=""
+  for i in `git branch -r |grep -v master|grep -v develop`
+  #for i in `git branch -r --merged|grep release`
+      do
+         AGE=$(git log -1 --pretty=format:"%ar" $i |grep months|cut -d" " -f1)
+         if [ -z "$AGE" ]; then 
+            continue
+         elif [ "$AGE" -ge 6 ]; then 
+            DEL_BRC="$DEL_BRC  $i"
+         else
+            continue
+         fi
+      done
+
+  for j in $DEL_BRC
+      do 
+         brc=`echo $j |awk -Forigin/ '{print $2}'`
+         echo $brc
+         git push origin :$brc -n
       done
 }
