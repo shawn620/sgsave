@@ -1,1 +1,1 @@
-several script mainly for making release branch, hotfix branch and etc
+2 dot file, .gitbuild and .build for release branch management (creation, update and cleanup)
