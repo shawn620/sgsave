@@ -11,7 +11,7 @@ function gitr() {
    	  echo 
    	  exit 1
    else
-      for i in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-app-leonhardt nyt5-app-homepage nyt5-foundation nyt5-app-blogs nyt5-app-paidpost
+      for i in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-app-leonhardt nyt5-app-homepage nyt5-foundation nyt5-app-blogs nyt5-app-paidpost nyt5-app-collection
 	       do
 	         cd $BUILD/$i
 	         echo "make remote and local release branch $i <===> release/$1 ......"
@@ -26,7 +26,7 @@ function gitr() {
         do
 	         cd $BUILD/$j
 	         k=`echo $j |cut -d"-" -f2`
-		       for m in article interactive shell blogs leonhardt homepage
+		       for m in article interactive shell blogs leonhardt homepage collection paidpost
 			       do 
 			           echo "make remote and local release branch bundle $k <===> release/$m/$1 ......"
 			           git checkout develop
@@ -219,13 +219,13 @@ gitmst() {
       echo
       exit -1
   else
-      for i in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-app-leonhardt nyt5-app-homepage nyt5-app-paidpost nyt5-foundation
+      for i in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-app-leonhardt nyt5-app-homepage nyt5-app-paidpost nyt5-foundation nyt5-app-collection
       do
         cd $BUILD/$i;
         git pull > /dev/null;
         git checkout -B release/$1 origin/release/$1;
         echo "Re-Create UpStream(github) master branch for $i from release/$1 ......";
-        git push origin release/$1:testmaster  --force;
+        git push origin release/$1:master  --force;
         echo
       done
       
@@ -235,18 +235,18 @@ gitmst() {
         git pull > /dev/null ;
         git checkout -B release/article/$1  origin/release/article/$1;
         echo "Re-Create UpStream(github) master branch for $i from release/article/$1  ..."
-        git push origin release/article/$1:testmaster --force;
+        git push origin release/article/$1:master --force;
         echo
       done
   fi
   echo "Now we go to each repo, DELETE old local master, pull down and re-create it ... "
-      for i in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-app-leonhardt nyt5-app-homepage nyt5-app-paidpost nyt5-foundation nyt5-shared
+      for i in nyt5-app-article nyt5-app-interactive nyt5-app-shell nyt5-app-leonhardt nyt5-app-homepage nyt5-app-collection nyt5-app-paidpost nyt5-foundation nyt5-shared 
         do
           cd $BUILD/$i;
-          git branch -D testmaster;
+          git branch -D master;
           git pull > /dev/null;
           echo $i
-          git checkout -B testmaster origin/testmaster;
+          git checkout -B master origin/master;
           echo 
         done
 }
