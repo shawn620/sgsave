@@ -1,0 +1,61 @@
+    ###  get the current Fastly Active VCL version number
+    CURRENT_ACTIVE_VER=`curl -X GET -H "Fastly-Key:${FASTLY_API_KEY}" https://api.fastly.com/service/${SERVICE_ID}/version/active | python -c 'import sys, json; print json.load(sys.stdin)["number"]'`
+    echo "Your current active fastly version :  ${CURRENT_ACTIVE_VER}"
+    echo "Current git commit: ${GIT_COMMIT}"
+    
+    echo "Last Successful Run git commit: ${GIT_PREVIOUS_SUCCESSFUL_COMMIT}"
+    
+    ## find the change set Addition, Modified, Deletion based on git commit sha key
+    set +e
+    git diff --name-status ${GIT_PREVIOUS_SUCCESSFUL_COMMIT} ${GIT_COMMIT} | fgrep 'www.stg' > myTmpFile
+    if [ -s myTmpFile ]; then
+    	while read line
+    	do
+    		echo ${line}
+        	if [[ "$line" =~ ^A+ ]]; then
+        		NEW+="${line##A*/} "
+        	elif [[ "$line" =~ ^D+ ]]; then
+				DEL+="${line##D*/} "
+        	else    
+        		CHG+="${line##M*/} "
+        	fi
+    	done < myTmpFile
+    
+    	echo "VCL additions are : ${NEW}"
+    	echo "VCL changes are : ${CHG}"
+    	echo "VCL deletions are : ${DEL}"
+    
+    	#### clone current active service and figure out file addition, modification and deletion as well as the next version number
+    	curl -X PUT -H "Fastly-Key:${FASTLY_API_KEY}" https://api.fastly.com/service/${SERVICE_ID}/version/${CURRENT_ACTIVE_VER}/clone
+    	NEXT_VERSION_NUM=`curl -X GET -H "Fastly-Key:${FASTLY_API_KEY}" https://api.fastly.com/service/${SERVICE_ID}/version | python -c 'import sys, json; print json.load(sys.stdin)[-1]["number"]'`
+    	echo "Your next active Fastly version will be =====> ${NEXT_VERSION_NUM} "
+    
+    	for i in ${NEW}
+    	do
+    			curl -X POST -H "Fastly-Key:${FASTLY_API_KEY}" https://api.fastly.com/service/${SERVICE_ID}/version/${NEXT_VERSION_NUM}/vcl -d "name=${i}"
+    	done
+    
+    	for i in ${CHG}
+    	do
+    		curl -X PUT -H "Fastly-Key:${FASTLY_API_KEY}" https://api.fastly.com/service/${SERVICE_ID}/version/${NEXT_VERSION_NUM}/vcl/${i}
+    	done
+    
+    	for i in ${DEL}
+    	do
+    		curl -X DELETE -H "Fastly-Key:${FASTLY_API_KEY}" https://api.fastly.com/service/${SERVICE_ID}/version/${NEXT_VERSION_NUM}/vcl/${i}
+    	done
+    
+    	echo "Validate the new version"
+    	NEW_STATUS=`curl -X GET -H "Fastly-Key:${FASTLY_API_KEY}" https://api.fastly.com/service/${SERVICE_ID}/version/${NEXT_VERSION_NUM}/validate | python -c 'import sys, json; print json.load(sys.stdin)["status"]'`
+    	echo ${NEW_STATUS}
+    	if [ "${NEW_STATUS}" != "ok" ]; then
+    		exit 1
+    	fi    
+    
+    	echo "Activate the new version of the service"
+    	curl -X PUT -H "Fastly-Key:${FASTLY_API_KEY}" https://api.fastly.com/service/${SERVICE_ID}/version/${NEXT_VERSION_NUM}/activate
+     
+    else
+		echo "There is no change set"
+        exit 0
+    fi    
